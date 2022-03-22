@@ -1,20 +1,17 @@
 package main
 
 import (
-	"fmt"
+	utility "github.com/chrisp986/the_village/internal/util"
 )
-
-const logo = `
-			   __	__                  _  __   __
-			  / /  / /    __    __   __(_)/ /  / /  ____    ____  ___
-			 / __//	/___/ _ \   | | / / // /  / /  / __ \  / __ \/ _ \
-			/ /_ /  _  /  __/   | |/ / // /__/ /__/ /_/ /_/ /_/ /  __/
-			\__//_/	/_/\___/    |___/_//____/____/_______/___  /\___/ 
-			                                              __/ /
-			                                             /___/`
 
 func main() {
 
-	fmt.Println(logo)
+	if !utility.IsSupportedOS() {
+		panic("OS not supported!")
+	}
+
+	utility.ShowLogo()
+
+	utility.MainMenu()
 
 }
