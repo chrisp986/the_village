@@ -1,8 +1,13 @@
 package utility
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
+	"time"
 )
 
 const logo = `
@@ -16,6 +21,7 @@ const logo = `
 ____________________________________________________________________________________________________
 
 `
+const serverUrl string = "http://localhost:8001"
 
 func ShowLogo() {
 	ClearScreen()
@@ -42,18 +48,19 @@ func MainMenu() {
 
 		switch choice {
 		case "1":
-			name := userInput("Name")
-			password := userInput("Password")
+			name := userInput("Choose your name: ")
+			createPlayer(name)
+			// password := userInput("Password")
 
-			fmt.Printf("Name: %s Password: %s\n", name, password)
-			break
+			// break
 
 		case "2":
 			fmt.Println("testtest")
 
 		case "99":
 			fmt.Println("Quitting The Village!")
-			os.Exit(3)
+			time.Sleep(2 * time.Second)
+			os.Exit(0)
 		}
 	}
 
@@ -61,7 +68,7 @@ func MainMenu() {
 
 func userInput(stmt string) string {
 
-	fmt.Print(stmt + ": ")
+	fmt.Print(stmt)
 
 	var input string
 	_, err := fmt.Scanln(&input)
@@ -69,7 +76,44 @@ func userInput(stmt string) string {
 		fmt.Fprintln(os.Stderr, err)
 		return "error!"
 	}
-	// fmt.Printf("%T\n", input)
 	return fmt.Sprintf("%s", input)
 
+}
+
+type Player struct {
+	PlayerID    int32  `json:"player_id"`
+	PlayerName  string `json:"player_name"`
+	PlayerScore int64  `json:"player_score"`
+	Active      bool   `json:"active"`
+	Connected   bool   `json:"connected"`
+}
+
+func createPlayer(name string) {
+
+	values := Player{
+		PlayerID:    5,
+		PlayerName:  name,
+		PlayerScore: 0,
+		Active:      true,
+		Connected:   false,
+	}
+
+	json_data, err := json.Marshal(values)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resp, err := http.Post(serverUrl+"/v1/players", "application/json",
+		bytes.NewBuffer(json_data))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var res map[string]interface{}
+
+	json.NewDecoder(resp.Body).Decode(&res)
+
+	fmt.Println(res["json"])
 }
