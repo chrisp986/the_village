@@ -1,13 +1,17 @@
 package utility
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"syscall"
 	"time"
+
+	"golang.org/x/term"
 )
 
 const logo = `
@@ -48,8 +52,13 @@ func MainMenu() {
 
 		switch choice {
 		case "1":
-			name := userInput("Choose your name: ")
-			createPlayer(name)
+			name, password, email, err := credentials()
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			// name := userInput("Choose your name: ")
+			createPlayer(name, password, email)
 			// password := userInput("Password")
 
 			// break
@@ -83,19 +92,25 @@ func userInput(stmt string) string {
 type Player struct {
 	PlayerID    int32  `json:"player_id"`
 	PlayerName  string `json:"player_name"`
+	Password    string `json:"password"`
+	Email       string `json:"email"`
 	PlayerScore int64  `json:"player_score"`
 	Active      bool   `json:"active"`
 	Connected   bool   `json:"connected"`
+	Created     string `json:"created"`
 }
 
-func createPlayer(name string) {
+func createPlayer(name string, password string, email string) {
 
 	values := Player{
 		PlayerID:    5,
 		PlayerName:  name,
+		Password:    password,
+		Email:       email,
 		PlayerScore: 0,
 		Active:      true,
 		Connected:   false,
+		Created:     time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	json_data, err := json.Marshal(values)
@@ -116,4 +131,27 @@ func createPlayer(name string) {
 	json.NewDecoder(resp.Body).Decode(&res)
 
 	fmt.Println(res["json"])
+}
+
+func credentials() (username string, password string, email string, err error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Enter Username: ")
+	username, err = reader.ReadString('\n')
+	if err != nil {
+		return "", "", "", err
+	}
+
+	fmt.Print("Enter Email: ")
+	email, err = reader.ReadString('\n')
+	if err != nil {
+		return "", "", "", err
+	}
+
+	fmt.Print("Enter Password: ")
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		return "", "", "", err
+	}
+	return username, string(bytePassword[:]), email, nil
 }
