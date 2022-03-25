@@ -36,8 +36,6 @@ func ShowLogo() {
 
 func MainMenu() {
 
-	// fmt.Println("Type your name: ")
-
 	pages := []string{"(1) Create player", "(2) Do stuff", "(99) Quit"}
 
 	fmt.Println("____Main Menu____")
@@ -73,6 +71,59 @@ func MainMenu() {
 		}
 	}
 
+}
+
+func MainMenu2() {
+	fmt.Println("-> Welcome to Reminders Console App, built using Golang and Microsoft SQL Server")
+	fmt.Println("-> Select a numeric option; \n [1] Create a new Reminder \n [2] Get a reminder \n [3] Delete a reminder")
+
+	consoleReader := bufio.NewScanner(os.Stdin)
+	consoleReader.Scan()
+	userChoice := consoleReader.Text()
+
+	switch userChoice {
+	case "1":
+		var (
+			titleInput,
+			descriptionInput,
+			aliasInput string
+		)
+		fmt.Println("You are about to create a new reminder. Please provide the following details:")
+
+		fmt.Println("-> What is the title of your reminder?")
+		consoleReader.Scan()
+		titleInput = consoleReader.Text()
+
+		fmt.Println("-> What is the description of your reminder?")
+		consoleReader.Scan()
+		descriptionInput = consoleReader.Text()
+
+		fmt.Println("-> What is an alias of your reminder? [ An alias will be used to retrieve your reminder ]")
+		consoleReader.Scan()
+		aliasInput = consoleReader.Text()
+
+		// data.CreateReminder(titleInput, descriptionInput, aliasInput)
+		fmt.Println(titleInput, descriptionInput, aliasInput)
+
+	case "2":
+		fmt.Println("-> Please provide an alias for your reminder:")
+		consoleReader.Scan()
+		aliasInput := consoleReader.Text()
+
+		// data.RetrieveReminder(aliasInput)
+		fmt.Println(aliasInput)
+
+	case "3":
+		fmt.Println("-> Please provide the alias for the reminder you want to delete:")
+		consoleReader.Scan()
+		deleteAlias := consoleReader.Text()
+
+		// data.DeleteReminder(deleteAlias)
+		fmt.Println(deleteAlias)
+
+	default:
+		fmt.Printf("-> Option: %v is not a valid numeric option. Try 1 , 2 , 3", userChoice)
+	}
 }
 
 func userInput(stmt string) string {
